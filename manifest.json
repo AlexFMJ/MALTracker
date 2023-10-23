@@ -1,0 +1,11 @@
+{
+    "manifest_version": 2,
+    "name": "MAL Tracker",
+    "version": "1.0",
+
+    "description": "Updates your MAL list automatically as you watch anime.",
+
+    "background": {
+        "scripts": ["background.js"]
+    }
+}
