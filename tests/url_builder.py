@@ -14,17 +14,16 @@ def get_new_code_verifier() -> str:
     return token[:128]
 
 
-code_verifier = code_challenge = get_new_code_verifier()    # Equal because MAL only supports plain transformation method
-
 auth_server_url = 'https://myanimelist.net/v1/oauth2/authorize'
 token_server_url = 'https://myanimelist.net/v1/oauth2/token'
 
 response_type = 'code'
 client_id = 'f0d607de3f9a4b4302d360befdaacc38'
 client_secret = 'a7e476a26603946f26553b1cbd0dbf53f4e898def49c3aa1076b009962423961'
+code_verifier = code_challenge = get_new_code_verifier()    # Equal because MAL only supports plain transformation method
 state = 'OauthTest'
 
-payload = {'response_type': response_type, 'client_id': client_id, 'client_secret': client_secret, 'code_challenge' : code_challenge, 'state':state}
+user_auth_payload = {'response_type': response_type, 'client_id': client_id, 'client_secret': client_secret, 'code_challenge' : code_challenge, 'state':state}
 
 s = requests.Session()
 
@@ -49,16 +48,20 @@ def user_authorization():
     # r = requests.Request('GET', auth_server_url, params=payload)
     # prepared = r.prepare()
     # pretty_print_POST(prepared)
-    r = requests.get(auth_server_url, params=payload)
+    r = requests.get(auth_server_url, params=user_auth_payload)
 
     print(r)
 
 def get_new_token():
+    token_req_payload = {'client_id':client_id, 'client_secret':client_secret, 'code':auth_code, 'code_verifier':code_verifier, 'grant_type':'authorization_code'}
 
-    token_req_payload = {'grant_type' : 'client_credentials'}
+    token_response = requests.post(auth_server_url, params=token_req_payload)
 
-    token_response = requests.post(auth_server_url,
-                                   data=token_req_payload, verify=False, allow_redirects=True, auth=(client_id, client_secret))
-
+# send the authorization request
 user_authorization()
+
+# verifiy the response state and save the auth_code to a variable
+
+
+get_new_token()
 print("done")
