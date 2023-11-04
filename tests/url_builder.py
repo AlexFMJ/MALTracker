@@ -61,7 +61,7 @@ def get_new_token():
 user_authorization()
 
 # verifiy the response state and save the auth_code to a variable
-
+# how do I actually get the link and response from the auth server? Do I need to start a session with flask/other?
 
 get_new_token()
 print("done")

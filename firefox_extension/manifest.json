@@ -5,7 +5,10 @@
 
     "description": "Updates your MAL list automatically as you watch anime.",
 
-    "background": {
-        "scripts": ["background.js"]
+    "permissions": ["activeTab"],
+
+    "browser_action": {
+        "default_title": "ALTracker",
+        "default_popup": "popup/ALT_popup.html"
     }
 }
