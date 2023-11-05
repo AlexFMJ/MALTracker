@@ -6,6 +6,9 @@
 
 // Create and store a new PKCE code_verifier (the plaintext random secret)
 var code_verifier = generateRandomString(128);
+
+////////// CHANGE THIS TO STORAGE FOR USE IN EXTENSION //////////////
+// https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage
 localStorage.setItem("local_code_verifier", code_verifier);
 
 var code_challenge = code_verifier; // MAL only supports plain. Makes my life easier...
@@ -19,7 +22,7 @@ localStorage.setItem("local_current_state", state);
 function getstate() {
     state = generateRandomString(16);
     localStorage.setItem("local_current_state", state);
-    console.log("state:",state)
+    console.log("new state:",state)
 }
 
 
@@ -76,8 +79,14 @@ function runthedamnthing() {
     // console.log(generateRandomString(32))
 };
 
-function tokenCheck() {
 
+function verifierCheck() {
+    console.log(localStorage.getItem("local_code_verifier"));
+};
+
+
+function tokenCheck() {
+    // TODO
 };
 
 
