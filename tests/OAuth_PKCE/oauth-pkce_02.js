@@ -71,6 +71,15 @@ var url = config.authorization_endpoint
     //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
     ;
 
+// Build the token URL to be sent as a POST request
+var token_url = config.authorization_endpoint 
+    + "&client_id="+encodeURIComponent(config.client_id)
+    + "?code="+encodeURIComponent(localStorage.getItem("authorization_response"))
+    + "&code_verifier="+encodeURIComponent(code_challenge)
+    + "&grant_type=authorization_code"
+    //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
+    ;
+
 console.log("URL:", url);
 
 function runthedamnthing() {
