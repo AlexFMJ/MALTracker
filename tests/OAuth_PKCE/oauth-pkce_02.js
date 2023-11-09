@@ -29,7 +29,7 @@ function getstate() {
 // Combine all data for MAL API into one dict.
 var config = {
     client_id: "92b69132bb2ffad84cccada01aef0d18",
-    redirect_uri: "file:///F:/Coding/Personal/MALTracker/tests/OAuth_PKCE/test.html",
+    redirect_uri: "http://localhost:8080/tests/OAuth_PKCE/test.html",
     authorization_endpoint: "https://myanimelist.net/v1/oauth2/authorize",
     token_endpoint: "https://myanimelist.net/v1/oauth2/token"
 };
@@ -68,7 +68,7 @@ var url = config.authorization_endpoint
     + "&client_id="+encodeURIComponent(config.client_id)
     + "&code_challenge="+encodeURIComponent(code_challenge)
     + "&state="+encodeURIComponent(state)
-    // + "&redirect_uri="+encodeURIComponent(config.redirect_uri)
+    //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
     ;
 
 console.log("URL:", url);
@@ -81,7 +81,7 @@ function runthedamnthing() {
 
 
 function verifierCheck() {
-    console.log(localStorage.getItem("local_code_verifier"));
+    console.log(localStorage.getItem("persistent_code_verifier"));
 };
 
 
@@ -91,14 +91,27 @@ function tokenCheck() {
 
 
 function getRequest() {
-    window.location = url;
+    window.open(url, '_blank');
     // TODO change this to open a new tab, to keep session going(?)
 };
 
 
+function saveChallenge() {
+    localStorage.setItem("persistent_code_verifier", code_verifier);
+    console.log("Saved:", localStorage.getItem("persistent_code_verifier"));
+}
+
+
+function saveAuthCode() {
+    var auth_response = document.getElementById('authResponse').value;
+    localStorage.setItem("authorization_response", auth_response);
+    console.log("Saved:", localStorage.getItem("authorization_response"));
+}
+
 
 /** TODO:
  * Find a way to get the OAuth2 token back after the request.
+ *  - read the return url after clicking accept
  * Save the token even after the window closes, then check for the token on page load.
  * Refresh the token automatically
  * 

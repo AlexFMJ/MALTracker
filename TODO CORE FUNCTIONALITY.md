@@ -6,6 +6,7 @@ TODO CORE FUNCTIONALITY
 
 - auto detect anime
     - start with crunchyroll and hi-dive, then work out to others
+    - query MAL with given name. if more than one response, show top 4/5 results
 
 - manual correction for anime (incase it gets it wrong)
     - needs to remember this correction

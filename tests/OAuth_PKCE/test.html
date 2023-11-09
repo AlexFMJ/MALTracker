@@ -6,6 +6,9 @@
             body{
                 background-color: grey;
             }
+            .hidden{
+                display: none;
+            }
         </style>
     </head>
     <body>
@@ -13,5 +16,19 @@
         <button onclick="getRequest()">send get request</button>
         <button onclick="verifierCheck()">get verifier</button>
         <button onclick="tokenCheck()">check for token</button>
+        <div>
+            <button onclick="saveChallenge()">Save Challenge</button>
+        </div>
+        <form>
+            <input type="text" id="authResponse" placeholder="Copy Auth Code Here:">
+            <button type="button" onclick="saveAuthCode()">Save Auth Code</button>
+        </form>
+        <form>
+            <input type="text" id="show" placeholder="Show">
+            <button type="button" onclick="searchShows()">Search Shows</button>
+        </form>
+        <div id="shows" class="hidden">
+            <img src="unset">
+        </div>
     </body>
 </html>
