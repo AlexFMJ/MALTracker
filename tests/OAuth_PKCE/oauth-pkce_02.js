@@ -18,16 +18,9 @@ var code_challenge = code_verifier; // MAL only supports plain. Makes my life ea
 var state = generateRandomString(16);
 localStorage.setItem("local_current_state", state);
 
-// refreshes state when requested
-function getstate() {
-    state = generateRandomString(16);
-    localStorage.setItem("local_current_state", state);
-    console.log("new state:",state)
-}
-
 
 // Combine all data for MAL API into one dict.
-var config = {
+const config = {
     client_id: "92b69132bb2ffad84cccada01aef0d18",
     redirect_uri: "http://localhost:8080/tests/OAuth_PKCE/test.html",
     authorization_endpoint: "https://myanimelist.net/v1/oauth2/authorize",
@@ -71,14 +64,8 @@ var url = config.authorization_endpoint
     //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
     ;
 
-// Build the token URL to be sent as a POST request
-var token_url = config.authorization_endpoint 
-    + "&client_id="+encodeURIComponent(config.client_id)
-    + "?code="+encodeURIComponent(localStorage.getItem("authorization_response"))
-    + "&code_verifier="+encodeURIComponent(code_challenge)
-    + "&grant_type=authorization_code"
-    //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
-    ;
+
+var token_url;
 
 console.log("URL:", url);
 
@@ -89,13 +76,17 @@ function runthedamnthing() {
 };
 
 
-function verifierCheck() {
-    console.log(localStorage.getItem("persistent_code_verifier"));
-};
+function generateTokenLink() {
+    // Build the token URL to be sent as a POST request
+    token_url = config.token_endpoint 
+        + "&client_id="+encodeURIComponent(config.client_id)
+        + "?code="+encodeURIComponent(localStorage.getItem("authorization_response"))
+        + "&code_verifier="+encodeURIComponent(code_challenge)
+        + "&grant_type=authorization_code"
+        //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
+        ;
 
-
-function tokenCheck() {
-    // TODO
+    console.log(token_url);
 };
 
 
@@ -105,17 +96,40 @@ function getRequest() {
 };
 
 
+// refreshes state when requested
+function getstate() {
+    state = generateRandomString(16);
+    localStorage.setItem("local_current_state", state);
+    console.log("new state:",state)
+}
+
+
+// saves the input authcode for use in the token exchange step later
+function saveAuthCode() {
+    var auth_response = document.getElementById('authResponse').value;
+    localStorage.setItem("authorization_response", auth_response);
+    console.log("Saved:", localStorage.getItem("authorization_response"));
+}
+
+
+// save the code challenge generated on page load, making it persistent for later API calls
 function saveChallenge() {
     localStorage.setItem("persistent_code_verifier", code_verifier);
     console.log("Saved:", localStorage.getItem("persistent_code_verifier"));
 }
 
 
-function saveAuthCode() {
-    var auth_response = document.getElementById('authResponse').value;
-    localStorage.setItem("authorization_response", auth_response);
-    console.log("Saved:", localStorage.getItem("authorization_response"));
+// save the input response from token generation needed to make API calls
+function saveTokenResponse() {
+    var token_response = document.getElementById('tokenResponse').value;
+    localStorage.setItem("token_response", token_response);
+    console.log("Saved:", localStorage.getItem("token_response"));
 }
+
+// checks that the saved code verifier/challenge
+function verifierCheck() {
+    console.log(localStorage.getItem("persistent_code_verifier"));
+};
 
 
 /** TODO:

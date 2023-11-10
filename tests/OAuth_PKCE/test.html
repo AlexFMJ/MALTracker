@@ -15,13 +15,17 @@
         <button onclick="runthedamnthing()">generate new state</button>
         <button onclick="getRequest()">send get request</button>
         <button onclick="verifierCheck()">get verifier</button>
-        <button onclick="tokenCheck()">check for token</button>
+        <button onclick="generateTokenLink()">Generate Token Link</button>
         <div>
             <button onclick="saveChallenge()">Save Challenge</button>
         </div>
         <form>
             <input type="text" id="authResponse" placeholder="Copy Auth Code Here:">
             <button type="button" onclick="saveAuthCode()">Save Auth Code</button>
+        </form>
+        <form>
+            <input type="text" id="tokenResponse" placeholder="Copy Token Here:">
+            <button type="button" onclick="savetokenResponse()">Save Token</button>
         </form>
         <form>
             <input type="text" id="show" placeholder="Show">
