@@ -1,3 +1,9 @@
+TODO GENERAL
+- Make an API call manually
+- See about serverless hosting for backend
+
+
+
 TODO CORE FUNCTIONALITY
 - firefox browser extention
 
