@@ -7,10 +7,6 @@
 // Create and store a new PKCE code_verifier (the plaintext random secret)
 var code_verifier = generateRandomString(128);
 
-////////// CHANGE THIS TO STORAGE FOR USE IN EXTENSION //////////////
-// https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage
-localStorage.setItem("local_code_verifier", code_verifier);
-
 var code_challenge = code_verifier; // MAL only supports plain. Makes my life easier...
 
 
@@ -90,9 +86,15 @@ function generateTokenLink() {
 };
 
 
+// caches the current verifier and redirects with the url generated on load
 function getRequest() {
-    window.open(url, '_blank');
-    // TODO change this to open a new tab, to keep session going(?)
+        ////////// CHANGE THIS TO STORAGE FOR USE IN EXTENSION //////////////
+    // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage
+    localStorage.setItem("local_code_verifier", code_verifier);
+    console.log("saved: ", localStorage.getItem("local_code_verifier"));
+
+    // redirect
+    location.href = url;
 };
 
 
@@ -109,13 +111,33 @@ function saveAuthCode() {
     var auth_response = document.getElementById('authResponse').value;
     localStorage.setItem("authorization_response", auth_response);
     console.log("Saved:", localStorage.getItem("authorization_response"));
-}
 
 
-// save the code challenge generated on page load, making it persistent for later API calls
-function saveChallenge() {
-    localStorage.setItem("persistent_code_verifier", code_verifier);
-    console.log("Saved:", localStorage.getItem("persistent_code_verifier"));
+    // // Build the authorization URL
+    // var token_url = config.token_endpoint 
+    //     + "?response_type=code"
+    //     + "&client_id="+encodeURIComponent(config.client_id)
+    //     + "&code="+encodeURIComponent(auth_response)
+    //     + "&code_verifier="+encodeURIComponent(code_verifier)
+    //     + "&grant_type=authorization_code"
+    //     //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
+    //     ;
+        
+        
+    fetch(config.token_endpoint, {
+        method: "POST",
+        body: new URLSearchParams({ 
+            "client_id": config.client_id,
+            "code": auth_response,
+            "code_verifier": localStorage.getItem("local_code_verifier"),
+            "grant_type": "authorization_code"
+        })
+    })
+    .then(res => res.text())
+    .then(res => {
+        console.log(res)
+    });
+
 }
 
 
@@ -128,7 +150,7 @@ function saveTokenResponse() {
 
 // checks that the saved code verifier/challenge
 function verifierCheck() {
-    console.log(localStorage.getItem("persistent_code_verifier"));
+    console.log(localStorage.getItem("local_code_verifier"));
 };
 
 
