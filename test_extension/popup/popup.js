@@ -1,8 +1,4 @@
-/**
- * CREDIT:
- * https://gist.github.com/ahmetgeymen/a9dcd656a1527f6c73d9c712ea2d9d7e#file-index-html
- * https://thewoods.blog/base64url/
- */
+// import { generateRandomString } from "./pkce_gen.js";
 
 // Combine all data for MAL API into one dict.
 const config = {
@@ -12,27 +8,30 @@ const config = {
     token_endpoint: "https://myanimelist.net/v1/oauth2/token"
 };
 
+/**
+ * CREDIT:
+ * https://gist.github.com/ahmetgeymen/a9dcd656a1527f6c73d9c712ea2d9d7e#file-index-html
+ * https://thewoods.blog/base64url/
+ */
 
-// sanity check, log the code challenge and verifier
-// console.log("challenge:",code_challenge,"verifier :", code_verifier);
-
-
-// Base64-urlencodes the input string
+/** Base64-urlencodes the input string. */
 function base64urlencode(str) {
-    // Convert the ArrayBuffer to string using Uint8 array to conver to what btoa accepts.
-    // btoa accepts chars only within ascii 0-255 and base64 encodes them.
-    // Then convert the base64 encoded to base64url encoded
-    //   (replace + with -, replace / with _, trim trailing =)
+    /** 
+     * Convert the ArrayBuffer to string using Uint8 array to conver to what btoa accepts.
+     * btoa accepts chars only within ascii 0-255 and base64 encodes them.
+     * Then convert the base64 encoded to base64url encoded
+     * (replace + with -, replace / with _, trim trailing =) 
+     */
     return btoa(String.fromCharCode.apply(null, new Uint8Array(str)))
         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 
 /** 
- * Generate a secure random string using browser getRandomValues() and encoding to base64url
+ * Generate a secure random string using browser getRandomValues() and encoding to base64url.
  * Input: x preferred string length. ( Only multiples of 8 will give exact length expected (16,32,64,128) )
  * Output: y # of characters A-Z, a-z, 0-9, -_
-*/
+ */
 function generateRandomString(stringLength) {
     stringLength = Math.floor((stringLength/(8/6)));    // convert input length to correct base64 length, always rounds down when necessary
     var array = new Uint32Array(stringLength);
@@ -41,8 +40,10 @@ function generateRandomString(stringLength) {
 };
 
 
-// generates a code challenge and state
-// then builds and opens request link in new tab
+/** 
+ * Generates a code challenge and state for the request
+ * then builds and opens request link in new tab
+ */
 function loginMAL() {
     // Create and store a new PKCE code_verifier (the plaintext random secret)
     // TODO CHECK FOR VERIFIER IN STORAGE FIRST
@@ -55,7 +56,7 @@ function loginMAL() {
     var state = generateRandomString(16);
     localStorage.setItem("current_state", state);
 
-    // Sanity check for saved state abd challenge
+    // Sanity check for saved state and challenge
     console.log("Current state:", localStorage.current_state, "Code_challenge:", localStorage.code_challenge);
 
     
@@ -70,7 +71,7 @@ function loginMAL() {
     window.open(url, '_blank');
 };
 
-
+// either keep as function, or create during async function to API
 function generateTokenLink() {
     // Build the token URL to be sent as a POST request
     token_url = config.token_endpoint 
@@ -105,4 +106,28 @@ function saveAuthCode() {
         console.log(res)
     });
 
-}
+};
+
+function loginListener() {
+    document.addEventListener("click", (event) => {
+        /**
+         * Listen for the login button
+         * CHANGE THIS LATER AS NEEDED FOR MORE BUTTONS
+         */
+        
+        if (event.target.id === "login") {
+            // Ignore non-login click
+            console.log("Button Clicked");
+            loginMAL();
+        }
+        else {
+            console.log("not button");
+            return;
+        }
+    });
+};
+
+window.onload = (load) => {
+    console.log("Popup Opened")
+    loginListener();
+};
