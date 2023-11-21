@@ -1,0 +1,25 @@
+{
+    "manifest_version": 2,
+    "name": "Event_Request",
+    "version": "1.0",
+
+    "description": "Detects requests made from Mal's auth server and save the data",
+
+    "permissions": [
+        "activeTab",
+        "storage",
+        "webRequest"
+    ],
+
+    "browser_action": {
+        "default_title": "ALTracker",
+        "default_popup": "popup/popup.html"
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["*://myanimelist.net/v1/oauth2/*"],
+            "js": ["EventListeners/webRequest.js"]
+        }
+    ]
+}
