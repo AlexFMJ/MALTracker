@@ -18,7 +18,7 @@
 
     "content_scripts": [
         {
-            "matches": ["*://myanimelist.net/v1/oauth2/*", "*//:myanimelist.net/dialog/authorization"],
+            "matches": ["*://myanimelist.net/v1/oauth2/*", "*://myanimelist.net/dialog/authorization"],
             "js": ["EventListeners/webRequest.js"]
         }
     ]
