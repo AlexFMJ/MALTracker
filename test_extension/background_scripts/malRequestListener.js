@@ -1,41 +1,71 @@
-// intercept and cancel event request before it is sent
-// save data to session
+/**
+ * Reads and parses url sent from MAL to localhost:5500
+ * Saves code and state params to session storage
+ */
+
+console.log("loaded!");
+
 
 // target url requested by MAL after authenticating
-var target = ['*://myanimelist.net/submission/authorization'];
+const target = ['*://myanimelist.net/submission/authorization'];
 
 // the index for the location header when the auth POST request is given
-const location_index = 1;
-
-console.log("webRequest.js Loaded!!");
+const location_index = 1; 
 
 
-function parseCode(raw_url) {
-    // TODO Parse Url and save code + state to session data.
-} 
+/**
+ * Parses the url value from getURL, then saves code and state to session
+ * @param {*string} baseURL 
+ */
+function parseCode(baseURL) {
+    // prepare query string for URLSearchParams by removing everything before "?"
+    const authParams = baseURL.substring(baseURL.indexOf("?"));
+
+    // call URLSearchParams to make objects from any params contained in the url
+    const urlParams = new URLSearchParams(authParams);
 
 
-function echoURL(details) {
-    console.log("THIS IS A TEST!");
+    // check if params includes code, then submit and whatnot
+    if (urlParams.has("code")) {
+        console.log("code: ");
+        console.log(urlParams.get("code"));
+    }
+    else {
+        console.log("No Code Found!");
+    };
+
+
+    if (urlParams.has("state")) {
+        console.log("state: ");
+        console.log(urlParams.get("state"));
+    }
+    else {
+        console.log("No State Found!");
+    };
+};
+
+
+/**
+ * Listener for browser.webRequest.onHeadersRecieved
+ * @param {*object} details 
+ */
+function getURL(details) {
+    // TODO: Close Tab
     
-    // for (let header in details.responseHeaders) {
-    //     console.log(details.responseHeaders[header])
-    // };
+    // Location_index should always be the same from responseHeaders, 
+    // Result: string containing redirect URL requested by MAL to localhost
+    const baseURL = details.responseHeaders[location_index].value;
 
-    // Echoes the URL requested from MAL. Maybe there's a cleaner way to do it...
-    console.log("URL: " + details.responseHeaders[location_index].value);
-
-    parseCode(details.responseHeaders[location_index].value)
-
+    parseCode(baseURL);
     // TODO Block request and close window
 };
 
 browser.webRequest.onHeadersReceived.addListener(
-    echoURL,
+    getURL,
     {urls: target},
     ["responseHeaders"]
-    // ["blocking"]
+    // ["blocking"] // Maybe block the request here?
 );
 
-
+// TODO: When do I remove the listener and this whole script?
 // webRequest.onBeforeSendHeaders.removeListener(listener)
