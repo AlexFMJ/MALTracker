@@ -4,7 +4,7 @@
  * OR
  * read URL to send
 */
-
+console.log("REQUESTLISTENER.JS FOUND THE CORRECT PAGE!");
 /**
  * Parse request/URL for code info, save to storage
  */
