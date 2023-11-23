@@ -6,11 +6,12 @@
 console.log("loaded!");
 
 
-// target url requested by MAL after authenticating
+// target url requested by MAL after pressing agree on authentication dialogue
 const target = ['*://myanimelist.net/submission/authorization'];
 
 // the index for the location header when the auth POST request is given
-const location_index = 1; 
+// if this proves an issue later, make a function that searches for the location key instead
+const location_index = 1;
 
 
 /**
@@ -29,6 +30,7 @@ function parseCode(baseURL) {
     if (urlParams.has("code")) {
         console.log("code: ");
         console.log(urlParams.get("code"));
+        localStorage.setItem("auth_code", urlParams.get("code"));
     }
     else {
         console.log("No Code Found!");
@@ -38,6 +40,7 @@ function parseCode(baseURL) {
     if (urlParams.has("state")) {
         console.log("state: ");
         console.log(urlParams.get("state"));
+        localStorage.setItem("current_state", urlParams.get("state"));
     }
     else {
         console.log("No State Found!");
@@ -60,6 +63,9 @@ function getURL(details) {
     // TODO Block request and close window
 };
 
+
+// wait until headers are recieved
+// we will grab the URL with the code from the response headers 
 browser.webRequest.onHeadersReceived.addListener(
     getURL,
     {urls: target},

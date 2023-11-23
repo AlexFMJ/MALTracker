@@ -49,7 +49,7 @@ function loginMAL() {
     // TODO CHECK FOR VERIFIER IN STORAGE FIRST
     var code_verifier = generateRandomString(128);
     var code_challenge = code_verifier; // MAL only supports plain. Makes my life easier...
-    localStorage.setItem("code_challenge", code_challenge)
+    localStorage.setItem("code_challenge", code_challenge);
 
 
     // Create and store current state
@@ -108,20 +108,24 @@ function saveAuthCode() {
 
 };
 
-function loginListener() {
+
+/**
+ * Listen for button clicks
+ * CHANGE THIS LATER AS NEEDED FOR MORE BUTTONS
+ */
+function buttonListener() {
     document.addEventListener("click", (event) => {
-        /**
-         * Listen for the login button
-         * CHANGE THIS LATER AS NEEDED FOR MORE BUTTONS
-         */
         
         if (event.target.id === "login") {
             // Ignore non-login click
             console.log("Button Clicked");
             loginMAL();
         }
+        else if(event.target.id === "printCode") {
+            // echoes currently saved code hopefully
+            console.log(localStorage.getItem("auth_code"));
+        }
         else {
-            console.log("not button");
             return;
         }
     });
@@ -129,5 +133,5 @@ function loginListener() {
 
 window.onload = (load) => {
     console.log("Popup Opened")
-    loginListener();
+    buttonListener();
 };
