@@ -16,11 +16,11 @@ const location_index = 1;
 
 /**
  * Parses the url value from getURL, then saves code and state to session
- * @param {*string} baseURL 
+ * @param {string} authURL 
  */
-function parseCode(baseURL) {
+function parseCode(authURL) {
     // prepare query string for URLSearchParams by removing everything before "?"
-    const authParams = baseURL.substring(baseURL.indexOf("?"));
+    const authParams = authURL.substring(authURL.indexOf("?"));
 
     // call URLSearchParams to make objects from any params contained in the url
     const urlParams = new URLSearchParams(authParams);
@@ -50,16 +50,16 @@ function parseCode(baseURL) {
 
 /**
  * Listener for browser.webRequest.onHeadersRecieved
- * @param {*object} details 
+ * @param {object} details 
  */
 function getURL(details) {
     // TODO: Close Tab
     
     // Location_index should always be the same from responseHeaders, 
     // Result: string containing redirect URL requested by MAL to localhost
-    const baseURL = details.responseHeaders[location_index].value;
+    const authURL = details.responseHeaders[location_index].value;
 
-    parseCode(baseURL);
+    parseCode(authURL);
     // TODO Block request and close window
 };
 

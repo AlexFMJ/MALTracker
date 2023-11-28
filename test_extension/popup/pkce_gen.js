@@ -4,7 +4,10 @@
  * https://thewoods.blog/base64url/
  */
 
-/** Base64-urlencodes the input string. */
+/** 
+ * Base64-urlencodes the uint32array, then returns a string.
+ * @param {Uint32Array} str Accepts Uint32Array as input
+ */
 function base64urlencode(str) {
     /** 
      * Convert the ArrayBuffer to string using Uint8 array to conver to what btoa accepts.
@@ -17,10 +20,10 @@ function base64urlencode(str) {
 }
 
 
-/** 
+/**
  * Generate a secure random string using browser getRandomValues() and encoding to base64url.
- * Input: x preferred string length. ( Only multiples of 8 will give exact length expected (16,32,64,128) )
- * Output: y # of characters A-Z, a-z, 0-9, -_
+ * @param {int}        stringLength preferred string length. ( Only multiples of 8 will give exact length expected (16,32,64,128) ).
+ * @returns {string}                string with stringLength # of characters " A-Z, a-z, 0-9, -_ ".
  */
 export function generateRandomString(stringLength) {
     stringLength = Math.floor((stringLength/(8/6)));    // convert input length to correct base64 length, always rounds down when necessary
