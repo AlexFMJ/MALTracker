@@ -1,6 +1,7 @@
 html,
 body{
     background-color: #2a2b2f;
+    min-width: 300px;
 }
 
 h1 {

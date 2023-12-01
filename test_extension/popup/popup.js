@@ -5,7 +5,6 @@ const config = {
     client_id: "92b69132bb2ffad84cccada01aef0d18",
     redirect_uri: "http://localhost:8080/tests/OAuth_PKCE/test.html",
     authorization_endpoint: "https://myanimelist.net/v1/oauth2/authorize",
-    token_endpoint: "https://myanimelist.net/v1/oauth2/token"
 };
 
 /**
@@ -104,7 +103,7 @@ function saveAuthCode() {
             "grant_type": "authorization_code"
         })
     })
-    .then(res => res.text())
+    .then(res => res.text())    // takes in a promise object, reads it to text, then returns that as another promise object
     .then(res => {
         console.log(res)
     });
@@ -120,6 +119,42 @@ function showLogin() {
     };
 };
 
+/**
+ * Sends requests to read or update from MAL
+ * TODO: change depend on POST or GET request and all that
+ */
+function requestHandler() {
+    fetch("https://api.myanimelist.net/v2/anime"
+    + "?q="+"ranma"       // search query
+    + "&limit="+"4"     // response limit
+    , {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token")
+        }
+    })
+    .then((res) => {
+        console.log("response.status = ", res.status);
+        if (res.status === 200) {
+            console.log("good!")
+            return res.text();
+        }
+        else {
+            // get error code (401 unauthorized?) and resend refresh token
+            console.log("ERROR")
+            refreshToken();
+        }
+    })
+    .then(res => {
+        const MALResponse = JSON.parse(res);
+        console.log(MALResponse);
+    })
+};
+
+function refreshToken() {
+    // TODO
+}
+
 
 /**
  * Listen for button clicks
@@ -131,19 +166,19 @@ function buttonListener() {
         if (event.target.id === "login") {
             // Ignore non-login click
             console.log("Button Clicked");
-            loginMAL();
+            loginMAL()
         }
         else if(event.target.id === "printCode") {
             // echoes currently saved code hopefully
             console.log(localStorage.getItem("auth_code"));
         }
-        else if(event.target.id === "update") {
-            console.log("https://api.myanimelist.net/v2/anime/17074/my_list_status")
+        else if(event.target.id === "listAdd") {
+            requestHandler();
         }
         else {
             return;
         }
-    });
+    })
 };
 
 

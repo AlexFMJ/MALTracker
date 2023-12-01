@@ -1,12 +1,11 @@
 /**
  * Reads and parses url sent from MAL to localhost:5500
- * Saves code and state params to session storage
+ * Saves code and state params to session storage, then gets oAuth tokens
  */
 
 const config = {
     client_id: "92b69132bb2ffad84cccada01aef0d18",
     redirect_uri: "http://localhost:8080/tests/OAuth_PKCE/test.html",
-    authorization_endpoint: "https://myanimelist.net/v1/oauth2/authorize",
     token_endpoint: "https://myanimelist.net/v1/oauth2/token"
 };
 
@@ -34,17 +33,19 @@ function parseCode(authURL) {
     const urlParams = new URLSearchParams(authParams);
 
 
-    // check if params includes code, then submit and whatnot
+    // check if params includes code
     if (urlParams.has("code")) {
         console.log("code: ");
         console.log(urlParams.get("code"));
         localStorage.setItem("auth_code", urlParams.get("code"));
     }
+    // TODO: raise an error if this code is not found
     else {
         console.log("No Code Found!");
     };
 
-
+    //check if params includes state
+    // TODO Maybe delete, isn't really necessary to save it again
     if (urlParams.has("state")) {
         console.log("state: ");
         console.log(urlParams.get("state"));
@@ -63,19 +64,20 @@ function parseCode(authURL) {
         console.log(`Error: ${error}`);
     }
 
-    // checks for current state and code, then closes tab
-    if (localStorage.getItem("current_state") && localStorage.getItem("auth_code")) {
+    // checks for code, then closes tab (how to make sure this fires at the right time?)
+    if (localStorage.getItem("auth_code")) {
         // close MAL login window
         browser.tabs
         .query({active : true, currentWindow : true})
         .then(removeActive, onError);
 
-        // send post request
+        // send token request
         requestToken();
     }
 };
 
 
+// generates fetch request from MAL API, then saves response tokens
 function requestToken() {
     fetch(config.token_endpoint, {
         method: "POST",
@@ -86,15 +88,15 @@ function requestToken() {
             "grant_type": "authorization_code"
         })
     })
-    .then(res => res.text())
+    .then(res => res.text())    // formats response to text first
     .then(res => {
         const tokens = JSON.parse(res);
         localStorage.setItem("access_token", tokens.access_token);
         localStorage.setItem("refresh_token", tokens.refresh_token);
         console.log("token: ", localStorage.getItem("access_token"));
         console.log("refresh: ", localStorage.getItem("refresh_token"));
-    });
-}
+    })
+};
 
 
 /**
