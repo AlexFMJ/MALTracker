@@ -11,6 +11,10 @@ h1 {
     width: 100%;
 }
 
+.hidden {
+    display: none;
+}
+
 button {
     background-color: #435398;
     border: none;

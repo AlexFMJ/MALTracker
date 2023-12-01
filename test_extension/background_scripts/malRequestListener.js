@@ -3,6 +3,14 @@
  * Saves code and state params to session storage
  */
 
+const config = {
+    client_id: "92b69132bb2ffad84cccada01aef0d18",
+    redirect_uri: "http://localhost:8080/tests/OAuth_PKCE/test.html",
+    authorization_endpoint: "https://myanimelist.net/v1/oauth2/authorize",
+    token_endpoint: "https://myanimelist.net/v1/oauth2/token"
+};
+
+
 console.log("loaded!");
 
 
@@ -45,7 +53,48 @@ function parseCode(authURL) {
     else {
         console.log("No State Found!");
     };
+
+    // removes active tab
+    function removeActive(tabInfo) {
+        browser.tabs.remove(tabInfo[0].id);
+    }
+    // async error reporting
+    function onError(error) {
+        console.log(`Error: ${error}`);
+    }
+
+    // checks for current state and code, then closes tab
+    if (localStorage.getItem("current_state") && localStorage.getItem("auth_code")) {
+        // close MAL login window
+        browser.tabs
+        .query({active : true, currentWindow : true})
+        .then(removeActive, onError);
+
+        // send post request
+        requestToken();
+    }
 };
+
+
+function requestToken() {
+    fetch(config.token_endpoint, {
+        method: "POST",
+        body: new URLSearchParams({ 
+            "client_id": config.client_id,
+            "code": localStorage.getItem("auth_code"),
+            "code_verifier": localStorage.getItem("code_challenge"),
+            "grant_type": "authorization_code"
+        })
+    })
+    .then(res => res.text())
+    .then(res => {
+        const tokens = JSON.parse(res);
+        localStorage.setItem("access_token", tokens.access_token);
+        localStorage.setItem("refresh_token", tokens.refresh_token);
+        console.log("token: ", localStorage.getItem("access_token"));
+        console.log("refresh: ", localStorage.getItem("refresh_token"));
+    });
+}
 
 
 /**

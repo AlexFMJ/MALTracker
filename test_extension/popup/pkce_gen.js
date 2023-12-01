@@ -25,7 +25,7 @@ function base64urlencode(str) {
  * @param {int}        stringLength preferred string length. ( Only multiples of 8 will give exact length expected (16,32,64,128) ).
  * @returns {string}                string with stringLength # of characters " A-Z, a-z, 0-9, -_ ".
  */
-export function generateRandomString(stringLength) {
+function generateRandomString(stringLength) {
     stringLength = Math.floor((stringLength/(8/6)));    // convert input length to correct base64 length, always rounds down when necessary
     var array = new Uint32Array(stringLength);
     window.crypto.getRandomValues(array);               // 128 characters (96 bytes for generation, input into base64 (6-bits per char) [8bits\6bits]*96bytes=128 chars)

@@ -35,7 +35,7 @@ function base64urlencode(str) {
  * @param {int}        stringLength preferred string length. ( Only multiples of 8 will give exact length expected (16,32,64,128) ).
  * @returns {string}                string with stringLength # of characters " A-Z, a-z, 0-9, -_ ".
  */
-export function generateRandomString(stringLength) {
+function generateRandomString(stringLength) {
     stringLength = Math.floor((stringLength/(8/6)));    // convert input length to correct base64 length, always rounds down when necessary
     var array = new Uint32Array(stringLength);
     window.crypto.getRandomValues(array);               // 128 characters (96 bytes for generation, input into base64 (6-bits per char) [8bits\6bits]*96bytes=128 chars)
@@ -112,6 +112,15 @@ function saveAuthCode() {
 };
 
 
+// show login button if no token is currently saved to localStorage
+// TODO: or if api requests fail
+function showLogin() {
+    if (!localStorage.getItem("access_token")) {
+        document.querySelector("#login").classList.remove("hidden");
+    };
+};
+
+
 /**
  * Listen for button clicks
  * CHANGE THIS LATER AS NEEDED FOR MORE BUTTONS
@@ -128,13 +137,18 @@ function buttonListener() {
             // echoes currently saved code hopefully
             console.log(localStorage.getItem("auth_code"));
         }
+        else if(event.target.id === "update") {
+            console.log("https://api.myanimelist.net/v2/anime/17074/my_list_status")
+        }
         else {
             return;
         }
     });
 };
 
+
 window.onload = (load) => {
     console.log("Popup Opened")
     buttonListener();
+    showLogin();
 };
