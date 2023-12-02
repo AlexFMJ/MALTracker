@@ -5,6 +5,7 @@ const config = {
     client_id: "92b69132bb2ffad84cccada01aef0d18",
     redirect_uri: "http://localhost:8080/tests/OAuth_PKCE/test.html",
     authorization_endpoint: "https://myanimelist.net/v1/oauth2/authorize",
+    token_endpoint: "https://myanimelist.net/v1/oauth2/token"
 };
 
 /**
@@ -73,43 +74,6 @@ function loginMAL() {
     window.open(url, '_blank');
 };
 
-// either keep as function, or create during async function to API
-function generateTokenLink() {
-    // Build the token URL to be sent as a POST request
-    token_url = config.token_endpoint 
-        + "&client_id="+encodeURIComponent(config.client_id)
-        + "?code="+encodeURIComponent(localStorage.getItem("authorization_response"))
-        + "&code_verifier="+encodeURIComponent(code_challenge)
-        + "&grant_type=authorization_code"
-        //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
-        ;
-
-    console.log(token_url);
-};
-
-
-// saves the input authcode for use in the token exchange step later
-function saveAuthCode() {
-    var auth_response = document.getElementById('authResponse').value;
-    localStorage.setItem("authorization_response", auth_response);
-    console.log("Saved:", localStorage.getItem("authorization_response")); 
-        
-    fetch(config.token_endpoint, {
-        method: "POST",
-        body: new URLSearchParams({ 
-            "client_id": config.client_id,
-            "code": auth_response,
-            "code_verifier": localStorage.getItem("local_code_verifier"),
-            "grant_type": "authorization_code"
-        })
-    })
-    .then(res => res.text())    // takes in a promise object, reads it to text, then returns that as another promise object
-    .then(res => {
-        console.log(res)
-    });
-
-};
-
 
 // show login button if no token is currently saved to localStorage
 // TODO: or if api requests fail
@@ -124,13 +88,17 @@ function showLogin() {
  * TODO: change depend on POST or GET request and all that
  */
 function requestHandler() {
-    fetch("https://api.myanimelist.net/v2/anime"
-    + "?q="+"ranma"       // search query
-    + "&limit="+"4"     // response limit
-    , {
+    // Build the authorization URL
+    var url = "https://api.myanimelist.net/v2/"
+    + "anime"                                   // type of content, normally anime
+    + "?q="+encodeURIComponent("Mob Psycho")    // search query
+    + "&limit="+encodeURIComponent("4")         // response limit
+    ;
+
+    fetch(url, {
         method: "GET",
         headers: {
-            "Authorization": "Bearer " + localStorage.getItem("access_token")
+            "Authorization": "Bearer " + JSON.parse(localStorage.getItem("access_token")).token
         }
     })
     .then((res) => {
@@ -142,7 +110,7 @@ function requestHandler() {
         else {
             // get error code (401 unauthorized?) and resend refresh token
             console.log("ERROR")
-            refreshToken();
+            checkToken();
         }
     })
     .then(res => {
@@ -151,9 +119,70 @@ function requestHandler() {
     })
 };
 
+/** 
+ * check for access token, login or refresh if not found
+ */
+function checkToken() {
+    // if a token is not found, reauthorize and login
+    if (localStorage.getItem("access_token") == null || !JSON.parse(localStorage.getItem("access_token")).token) {
+            // TODO: add message telling user to sign in
+            console.log("token not found")
+            loginMAL();
+            return;
+    };
+
+    const month = 2419200000 // 28 days in miliseconds (epoch time)
+
+    // calculate time elapsed since last refresh
+    var timeElapsed = Date.now() - JSON.parse(localStorage.getItem("refresh_token")).timestamp;
+    console.log("time:", timeElapsed);
+
+    // if a month has passed since last refresh, reauthorize and login
+    if (timeElapsed > month) {
+        console.log("longer than a month has passed, login again")
+        loginMAL();
+        return;
+    }
+    // otherwise, only the original token should've timed out, so send refresh token
+    else {
+        console.log("submitting refresh token.")
+        refreshToken();
+        return;
+    };
+};
+
+
 function refreshToken() {
-    // TODO
-}
+    fetch(config.token_endpoint, {
+        method: "POST",
+        body: new URLSearchParams({ 
+            "client_id": config.client_id,
+            "grant_type": "authorization_code",
+            "refresh_token": JSON.parse(localStorage.getItem("refresh_token")).token
+        })
+    })
+    .then(res => res.text())    // formats response to text first
+    .then(res => {
+        const tokens = JSON.parse(res);
+        // create objects with token and timestamp to check for expiration later
+        var access_token = {
+            token: tokens.access_token, 
+            timestamp: Date.now()
+        }
+        var refresh_token = {
+            token: tokens.refresh_token, 
+            timestamp: Date.now()
+        }
+
+        // save objects to localStorage, must be saved as string (hence stringify)
+        localStorage.setItem("access_token", JSON.stringify(access_token));
+        localStorage.setItem("refresh_token", JSON.stringify(refresh_token));
+
+        // log saved object values (DELETE LATER)
+        console.log("updated token: ", JSON.parse(localStorage.getItem("access_token")).token , "timestamp: ", JSON.parse(localStorage.getItem("access_token")).timestamp);
+        console.log("updated refresh token: ", JSON.parse(localStorage.getItem("refresh_token")).token , "timestamp: ", JSON.parse(localStorage.getItem("refresh_token")).timestamp);
+    })
+};
 
 
 /**
