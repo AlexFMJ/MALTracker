@@ -3,8 +3,8 @@
     <head>
         <script src="popup.js"></script>
         <!-- add request handler script -->
-        <link rel="stylesheet" href="popup.css">
         <link rel="stylesheet" href="popup_list.css">
+        <script src="markup.js"></script>
     </head>
     <body>
         <div id="header">
@@ -14,11 +14,9 @@
         <div id="MALResults">
         </div>
 
-        <div id="api-buttons">
+        <div id="popup-buttons">
             <!-- ONLY SHOW AFTER CHECKING FOR AUTHENTICATION (Visibility?)-->
-            <button type="echo" id="printCode">Print Current Code</button>
-            <button type="echo" id="listAdd">Send Request</button>
-            <button type="loginmal" id="login" class="hidden">Login to MAL</button>
+            <button onclick="createListEntry()">test</button>
         </div>
     </body>
 </html>

@@ -2,18 +2,12 @@ html,
 body{
     background-color: #2a2b2f;
     min-width: 300px;
+    max-width: 400px;
+    scrollbar-width: thin;
 }
 
 
-.anime {
-    display: block;
-    background-color: crimson;
-    margin: 3% auto;
-    color: white;
-}
-
-
-button {
+#api-buttons button {
     background-color: #435398;
     border: none;
     color: white;
@@ -43,11 +37,4 @@ h1 {
 
 .hidden {
     display: none;
-}
-
-
-#MALResults {
-    display: grid;
-    width: 100%;
-    grid-template-columns: 1fr 1fr;
 }

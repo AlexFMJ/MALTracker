@@ -1,14 +1,7 @@
-body {
-    display: block;
-    background-color: grey;
-    color: white;
-    margin: 0;
-    /* width: 400px; */
-}
-
 .anime {
+    color: white;
     align-content: flex-start;
-    background-color: rgb(41, 41, 41);
+    background-color: rgb(28, 28, 28);
     display: flex;
     margin: 1vw;
     position: relative;
@@ -48,18 +41,18 @@ body {
 
 
 /* Button Styling Below */
-button {
+.entry-buttons button {
     font-size:0.8em;
     outline:none;
     border: none;
     border-radius: 0.2em;
     cursor: pointer;
 }
-button:hover {
+.entry-buttons button:hover {
     opacity: 75%;
 }
 
-#anime-buttons {
+.entry-buttons {
     column-gap: 2vw;
     display: grid;
     margin: auto 0;
@@ -72,12 +65,12 @@ button:hover {
     height: 7vw;
 }
 
-#selectAnime {
+.selectAnime {
     background-color: rgb(91, 136, 91);
     Color: white;
 }
 
-#moreInfo {
+.moreInfo {
     background-color: rgb(66, 68, 171);
     color: white;
 }

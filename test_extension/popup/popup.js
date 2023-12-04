@@ -90,6 +90,33 @@ function checkToken() {
 
 
 /**
+ * Take in the current antry fron the listAnime function, and create an
+ * HTML div for it with all necessary inclusions.
+ * @param {Object} currentEntry 
+ */
+function createListEntry(currentEntry) {
+    const entry = `
+        <div class="anime">
+            <div class="poster">
+                <img src=${currentEntry.main_picture.medium}>
+            </div>
+            <div class="info">
+                <p id="title">${currentEntry.title}</p>
+                <hr color="white" width="99%" size="0.5px">
+                <div class="entry-buttons">
+                    <button class="selectAnime" value="${currentEntry.id}">Select</button>
+                    <button class="moreInfo" value="id">More Info</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // inserts the above html entry into the MALResults div, after any other entries
+    document.body.querySelector("#MALResults").insertAdjacentHTML("beforeend", entry);
+}
+
+
+/**
  * Generate a secure random string using browser getRandomValues() and encoding to base64url.
  * @param {int}        stringLength preferred string length. ( Only multiples of 8 will give exact length expected (16,32,64,128) ).
  * @returns {string}                string with stringLength # of characters " A-Z, a-z, 0-9, -_ ".
@@ -116,15 +143,7 @@ function listAnime(apiResponse) {
         var thisAnime = resData[anime].node;
 
         //create element
-        const newDiv = document.createElement("div");
-        const title = document.createTextNode(thisAnime.title);
-        newDiv.appendChild(title);
-        newDiv.classList.add("anime");
-        const currentDiv = document.getElementById("MALResults");
-        currentDiv.appendChild(newDiv);
-
-            // anime.node.title
-            // anime.node.main_picture.medium
+        createListEntry(thisAnime);
     }
     // TODO:
     // Save this list until a new api request is made or something else changes
@@ -208,7 +227,7 @@ function requestHandler() {
     // Build the authorization URL
     var url = "https://api.myanimelist.net/v2/"
     + "anime"                                   // type of content, normally anime
-    + "?q="+encodeURIComponent("Cowboy Bebop")  // search query
+    + "?q="+encodeURIComponent("Is it wrong to pickup girls")  // search query
     + "&limit="+encodeURIComponent("4")         // response limit
     ;
 
