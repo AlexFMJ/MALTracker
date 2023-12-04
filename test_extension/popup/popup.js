@@ -31,93 +31,30 @@ function base64urlencode(str) {
 
 
 /**
- * Generate a secure random string using browser getRandomValues() and encoding to base64url.
- * @param {int}        stringLength preferred string length. ( Only multiples of 8 will give exact length expected (16,32,64,128) ).
- * @returns {string}                string with stringLength # of characters " A-Z, a-z, 0-9, -_ ".
+ * Listen for button clicks
+ * CHANGE THIS LATER AS NEEDED FOR MORE BUTTONS
  */
-function generateRandomString(stringLength) {
-    stringLength = Math.floor((stringLength/(8/6)));    // convert input length to correct base64 length, always rounds down when necessary
-    var array = new Uint32Array(stringLength);
-    window.crypto.getRandomValues(array);               // 128 characters (96 bytes for generation, input into base64 (6-bits per char) [8bits\6bits]*96bytes=128 chars)
-    return base64urlencode(array);   // base64urlencode takes an array as input, reads numbers to their own 
-};
-
-
-/** 
- * Generates a code challenge and state for the request
- * then builds and opens request link in new tab
- */
-function loginMAL() {
-    // Create and store a new PKCE code_verifier (the plaintext random secret)
-    // TODO CHECK FOR VERIFIER IN STORAGE FIRST
-    var code_verifier = generateRandomString(128);
-    var code_challenge = code_verifier; // MAL only supports plain. Makes my life easier...
-    localStorage.setItem("code_challenge", code_challenge);
-
-
-    // Create and store current state
-    var state = generateRandomString(16);
-    localStorage.setItem("current_state", state);
-
-    // Sanity check for saved state and challenge
-    console.log("Current state:", localStorage.current_state, "Code_challenge:", localStorage.code_challenge);
-
-    
-    // Build the authorization URL
-    var url = config.authorization_endpoint 
-    + "?response_type=code"
-    + "&client_id="+encodeURIComponent(config.client_id)
-    + "&code_challenge="+encodeURIComponent(code_challenge)
-    + "&state="+encodeURIComponent(state)
-    //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
-    ;
-    window.open(url, '_blank');
-};
-
-
-// show login button if no token is currently saved to localStorage
-// TODO: or if api requests fail
-function showLogin() {
-    if (!localStorage.getItem("access_token")) {
-        document.querySelector("#login").classList.remove("hidden");
-    };
-};
-
-/**
- * Sends requests to read or update from MAL
- * TODO: change depend on POST or GET request and all that
- */
-function requestHandler() {
-    // Build the authorization URL
-    var url = "https://api.myanimelist.net/v2/"
-    + "anime"                                   // type of content, normally anime
-    + "?q="+encodeURIComponent("Mob Psycho")    // search query
-    + "&limit="+encodeURIComponent("4")         // response limit
-    ;
-
-    fetch(url, {
-        method: "GET",
-        headers: {
-            "Authorization": "Bearer " + JSON.parse(localStorage.getItem("access_token")).token
+function buttonListener() {
+    document.addEventListener("click", (event) => {
+        
+        if (event.target.id === "login") {
+            // Ignore non-login click
+            console.log("Button Clicked");
+            loginMAL()
         }
-    })
-    .then((res) => {
-        console.log("response.status = ", res.status);
-        if (res.status === 200) {
-            console.log("good!")
-            return res.text();
+        else if(event.target.id === "printCode") {
+            // echoes currently saved code hopefully
+            console.log(localStorage.getItem("auth_code"));
+        }
+        else if(event.target.id === "listAdd") {
+            requestHandler();
         }
         else {
-            // get error code (401 unauthorized?) and resend refresh token
-            console.log("ERROR")
-            checkToken();
+            return;
         }
     })
-    .then(res => {
-        const MALResponse = JSON.parse(res);
-        console.log(MALResponse);
-    })
 };
+
 
 /** 
  * check for access token, login or refresh if not found
@@ -152,6 +89,83 @@ function checkToken() {
 };
 
 
+/**
+ * Generate a secure random string using browser getRandomValues() and encoding to base64url.
+ * @param {int}        stringLength preferred string length. ( Only multiples of 8 will give exact length expected (16,32,64,128) ).
+ * @returns {string}                string with stringLength # of characters " A-Z, a-z, 0-9, -_ ".
+ */
+function generateRandomString(stringLength) {
+    stringLength = Math.floor((stringLength/(8/6)));    // convert input length to correct base64 length, always rounds down when necessary
+    var array = new Uint32Array(stringLength);
+    window.crypto.getRandomValues(array);               // 128 characters (96 bytes for generation, input into base64 (6-bits per char) [8bits\6bits]*96bytes=128 chars)
+    return base64urlencode(array);   // base64urlencode takes an array as input, reads numbers to their own 
+};
+
+
+/**
+ * List the anime listed in the MAL query response, including titles and images
+ * @param {object}  apiResponse response given from the MAL anime query request
+ */
+function listAnime(apiResponse) {
+    // we'll be dialing this a lot, so make it short
+    var resData = apiResponse.data;
+
+    for (anime in resData) {
+        console.log(resData[anime]);
+
+        var thisAnime = resData[anime].node;
+
+        //create element
+        const newDiv = document.createElement("div");
+        const title = document.createTextNode(thisAnime.title);
+        newDiv.appendChild(title);
+        const currentDiv = document.getElementById("MALInfo");
+        document.body.appendChild(newDiv, currentDiv)
+
+            // anime.node.title
+            // anime.node.main_picture.medium
+    }
+    // TODO:
+    // Save this list until a new api request is made or something else changes
+}
+
+
+/** 
+ * Generates a code challenge and state for the request
+ * then builds and opens request link in new tab
+ */
+function loginMAL() {
+    // Create and store a new PKCE code_verifier (the plaintext random secret)
+    // TODO CHECK FOR VERIFIER IN STORAGE FIRST
+    var code_verifier = generateRandomString(128);
+    var code_challenge = code_verifier; // MAL only supports plain. Makes my life easier...
+    localStorage.setItem("code_challenge", code_challenge);
+
+
+    // Create and store current state
+    var state = generateRandomString(16);
+    localStorage.setItem("current_state", state);
+
+    // Sanity check for saved state and challenge
+    console.log("Current state:", localStorage.current_state, "Code_challenge:", localStorage.code_challenge);
+
+    
+    // Build the authorization URL
+    var url = config.authorization_endpoint 
+    + "?response_type=code"
+    + "&client_id="+encodeURIComponent(config.client_id)
+    + "&code_challenge="+encodeURIComponent(code_challenge)
+    + "&state="+encodeURIComponent(state)
+    //+ "&redirect_uri="+encodeURIComponent(config.redirect_uri)
+    ;
+    window.open(url, '_blank');
+};
+
+
+/**
+ * Generates a new access token using previously saved refresh token
+ * if refresh token has expired, reprompts user to login again
+ */
 function refreshToken() {
     fetch(config.token_endpoint, {
         method: "POST",
@@ -186,28 +200,49 @@ function refreshToken() {
 
 
 /**
- * Listen for button clicks
- * CHANGE THIS LATER AS NEEDED FOR MORE BUTTONS
+ * Sends requests to read or update from MAL
+ * TODO: change depend on POST or GET request and all that
  */
-function buttonListener() {
-    document.addEventListener("click", (event) => {
-        
-        if (event.target.id === "login") {
-            // Ignore non-login click
-            console.log("Button Clicked");
-            loginMAL()
-        }
-        else if(event.target.id === "printCode") {
-            // echoes currently saved code hopefully
-            console.log(localStorage.getItem("auth_code"));
-        }
-        else if(event.target.id === "listAdd") {
-            requestHandler();
-        }
-        else {
-            return;
+function requestHandler() {
+    // Build the authorization URL
+    var url = "https://api.myanimelist.net/v2/"
+    + "anime"                                   // type of content, normally anime
+    + "?q="+encodeURIComponent("Cowboy Bebop")  // search query
+    + "&limit="+encodeURIComponent("4")         // response limit
+    ;
+
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + JSON.parse(localStorage.getItem("access_token")).token
         }
     })
+    .then((res) => {
+        console.log("response.status = ", res.status);
+        if (res.status === 200) {
+            console.log("good!")
+            return res.text();
+        }
+        else {
+            // get error code (401 unauthorized?) and resend refresh token
+            console.log("ERROR")
+            checkToken();
+        }
+    })
+    .then(res => {
+        const MALResponse = JSON.parse(res);
+        console.log(MALResponse);
+        listAnime(MALResponse);
+    })
+};
+
+
+// show login button if no token is currently saved to localStorage
+// TODO: or if api requests fail
+function showLogin() {
+    if (!localStorage.getItem("access_token")) {
+        document.querySelector("#login").classList.remove("hidden");
+    };
 };
 
 
