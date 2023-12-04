@@ -4,17 +4,14 @@ body{
     min-width: 300px;
 }
 
-h1 {
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
-    text-align: center;
+
+.anime {
+    display: block;
+    background-color: crimson;
     margin: 3% auto;
-    width: 100%;
+    color: white;
 }
 
-.hidden {
-    display: none;
-}
 
 button {
     background-color: #435398;
@@ -29,6 +26,28 @@ button {
     border-radius: 5px;
 }
 
+
 button:hover {
     background-color: #a2a2a3;
+}
+
+
+h1 {
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    margin: 3% auto;
+    width: 100%;
+}
+
+
+.hidden {
+    display: none;
+}
+
+
+#MALResults {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
 }

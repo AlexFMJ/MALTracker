@@ -23,6 +23,20 @@ console.log("loaded!");
 
 
 /**
+ * Listener for browser.webRequest.onHeadersRecieved
+ * @param {object} details 
+ */
+function getURL(details) {
+    // Location_index should always be the same from responseHeaders, 
+    // Result: string containing redirect URL requested by MAL to localhost
+    const authURL = details.responseHeaders[location_index].value;
+
+    parseCode(authURL);
+    // TODO Block request and close window
+};
+
+
+/**
  * Parses the url value from getURL, then saves code and state to session
  * @param {string} authURL 
  */
@@ -56,14 +70,16 @@ function parseCode(authURL) {
         console.log("No State Found!");
     };
 
-    // removes active tab
-    function removeActive(tabInfo) {
-        browser.tabs.remove(tabInfo[0].id);
-    }
+
     // async error reporting
     function onError(error) {
         console.log(`Error: ${error}`);
-    }
+    };
+
+    // removes active tab
+    function removeActive(tabInfo) {
+        browser.tabs.remove(tabInfo[0].id);
+    };
 
     // checks for code, then closes tab (how to make sure this fires at the right time?)
     if (localStorage.getItem("auth_code")) {
@@ -74,7 +90,7 @@ function parseCode(authURL) {
 
         // send token request
         requestToken();
-    }
+    };
 };
 
 
@@ -113,22 +129,6 @@ function requestToken() {
         console.log("token: ", JSON.parse(localStorage.getItem("access_token")).token , "timestamp: ", JSON.parse(localStorage.getItem("access_token")).timestamp);
         console.log("token: ", JSON.parse(localStorage.getItem("refresh_token")).token , "timestamp: ", JSON.parse(localStorage.getItem("refresh_token")).timestamp);
     })
-};
-
-
-/**
- * Listener for browser.webRequest.onHeadersRecieved
- * @param {object} details 
- */
-function getURL(details) {
-    // TODO: Close Tab
-    
-    // Location_index should always be the same from responseHeaders, 
-    // Result: string containing redirect URL requested by MAL to localhost
-    const authURL = details.responseHeaders[location_index].value;
-
-    parseCode(authURL);
-    // TODO Block request and close window
 };
 
 

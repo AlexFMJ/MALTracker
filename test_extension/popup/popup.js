@@ -119,8 +119,9 @@ function listAnime(apiResponse) {
         const newDiv = document.createElement("div");
         const title = document.createTextNode(thisAnime.title);
         newDiv.appendChild(title);
-        const currentDiv = document.getElementById("MALInfo");
-        document.body.appendChild(newDiv, currentDiv)
+        newDiv.classList.add("anime");
+        const currentDiv = document.getElementById("MALResults");
+        currentDiv.appendChild(newDiv);
 
             // anime.node.title
             // anime.node.main_picture.medium
@@ -246,6 +247,7 @@ function showLogin() {
 };
 
 
+// Execution starts here
 window.onload = (load) => {
     console.log("Popup Opened")
     buttonListener();
