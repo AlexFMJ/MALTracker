@@ -56,6 +56,16 @@ function buttonListener() {
 };
 
 
+function checkForShow() {
+    if (sessionStorage.getItem("show_title")) {
+        console.log("Show title:", sessionStorage.getItem("show_title"));
+    }
+    else {
+        console.log("no show yet...");
+    }
+}
+
+
 /** 
  * check for access token, login or refresh if not found
  */
@@ -270,5 +280,6 @@ function showLogin() {
 window.onload = (load) => {
     console.log("Popup Opened")
     buttonListener();
+    checkForShow();
     showLogin();
 };
