@@ -227,8 +227,8 @@ function requestHandler() {
     // Build the authorization URL
     var url = "https://api.myanimelist.net/v2/"
     + "anime"                                   // type of content, normally anime
-    + "?q="+encodeURIComponent("Is it wrong to pickup girls")  // search query
-    + "&limit="+encodeURIComponent("4")         // response limit
+    + "?q="+encodeURIComponent("One Punch")  // search query
+    + "&limit="+encodeURIComponent("3")         // response limit
     ;
 
     fetch(url, {

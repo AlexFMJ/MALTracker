@@ -25,6 +25,10 @@
         {
             "matches": ["*://myanimelist.net/v1/oauth2/*", "*://myanimelist.net/dialog/authorization"],
             "js": ["content_scripts/login.js"]
+        },
+        {
+            "matches": ["*://www.crunchyroll.com/watch/*"],
+            "js": ["content_scripts/crunchyroll_parse.js"]
         }
     ]
 }
