@@ -8,6 +8,8 @@ const config = {
     token_endpoint: "https://myanimelist.net/v1/oauth2/token"
 };
 
+var show = new Object;
+
 /**
  * CREDIT:
  * https://gist.github.com/ahmetgeymen/a9dcd656a1527f6c73d9c712ea2d9d7e#file-index-html
@@ -42,12 +44,12 @@ function buttonListener() {
             console.log("Button Clicked");
             loginMAL()
         }
-        else if(event.target.id === "printCode") {
+        else if(event.target.id === "queryCurrent") {
             // echoes currently saved code hopefully
-            console.log(localStorage.getItem("auth_code"));
+            requestHandler(show.title);
         }
         else if(event.target.id === "listAdd") {
-            requestHandler();
+            requestHandler("Ranma 1/2");
         }
         else {
             return;
@@ -55,15 +57,25 @@ function buttonListener() {
     })
 };
 
-
+/**
+ * sends message to bg script asking for show information
+ * if found, assign it to the show variable
+ */
 function checkForShow() {
-    if (sessionStorage.getItem("show_title")) {
-        console.log("Show title:", sessionStorage.getItem("show_title"));
+    let sending = browser.runtime.sendMessage("getShow")
+
+    sending.then(response, responseError)
+
+    function response(message) {
+        show = JSON.parse(message)
+        console.log("Show title:", show.title);
     }
-    else {
+
+    function responseError(error) {
         console.log("no show yet...");
+        return null;
     }
-}
+};
 
 
 /** 
@@ -233,37 +245,48 @@ function refreshToken() {
  * Sends requests to read or update from MAL
  * TODO: change depend on POST or GET request and all that
  */
-function requestHandler() {
-    // Build the authorization URL
-    var url = "https://api.myanimelist.net/v2/"
-    + "anime"                                   // type of content, normally anime
-    + "?q="+encodeURIComponent("One Punch")  // search query
-    + "&limit="+encodeURIComponent("3")         // response limit
-    ;
-
-    fetch(url, {
-        method: "GET",
-        headers: {
-            "Authorization": "Bearer " + JSON.parse(localStorage.getItem("access_token")).token
-        }
-    })
-    .then((res) => {
-        console.log("response.status = ", res.status);
-        if (res.status === 200) {
-            console.log("good!")
-            return res.text();
-        }
-        else {
-            // get error code (401 unauthorized?) and resend refresh token
-            console.log("ERROR")
-            checkToken();
-        }
-    })
-    .then(res => {
-        const MALResponse = JSON.parse(res);
-        console.log(MALResponse);
-        listAnime(MALResponse);
-    })
+function requestHandler(query) {
+    // check for show info
+    if (!query) {
+        console.log("No show")
+        return;
+    }
+    // check for auth info
+    if (!localStorage.getItem("access_token")) {
+        checkToken()
+    }
+    else {
+        // Build the authorization URL
+        var url = "https://api.myanimelist.net/v2/"
+        + "anime"                                   // type of content, normally anime
+        + "?q="+encodeURIComponent(query)  // search query
+        + "&limit="+encodeURIComponent("3")         // response limit
+        ;
+    
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + JSON.parse(localStorage.getItem("access_token")).token
+            }
+        })
+        .then((res) => {
+            console.log("response.status = ", res.status);
+            if (res.status === 200) {
+                console.log("good!")
+                return res.text();
+            }
+            else {
+                // get error code (401 unauthorized?) and resend refresh token
+                console.log("ERROR")
+                checkToken();
+            }
+        })
+        .then(res => {
+            const MALResponse = JSON.parse(res);
+            console.log(MALResponse);
+            listAnime(MALResponse);
+        })
+    }
 };
 
 

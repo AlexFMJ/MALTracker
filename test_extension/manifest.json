@@ -19,7 +19,11 @@
     },
 
     "background": {
-        "scripts": ["background_scripts/malAuthListener.js", "background_scripts/cr_parse_v2.js"]
+        "scripts": [
+            "background_scripts/malAuthListener.js",
+            "background_scripts/cr_parse_v2.js",
+            "background_scripts/sessionStorage_messenger.js"
+        ]
     },
 
     "content_scripts": [
