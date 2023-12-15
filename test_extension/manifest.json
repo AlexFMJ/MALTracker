@@ -9,6 +9,7 @@
         "activeTab",
         "storage",
         "webRequest",
+        "webRequestBlocking",
         "<all_urls>"
     ],
 
@@ -18,17 +19,13 @@
     },
 
     "background": {
-        "scripts": ["background_scripts/malAuthListener.js"]
+        "scripts": ["background_scripts/malAuthListener.js", "background_scripts/cr_parse_v2.js"]
     },
 
     "content_scripts": [
         {
             "matches": ["*://myanimelist.net/v1/oauth2/*", "*://myanimelist.net/dialog/authorization"],
             "js": ["content_scripts/login.js"]
-        },
-        {
-            "matches": ["*://www.crunchyroll.com/watch/*"],
-            "js": ["content_scripts/crunchyroll_parse.js"]
         }
     ]
 }

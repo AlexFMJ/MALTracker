@@ -25,35 +25,36 @@
 // clear show information from session storage when tab is closed (is that possible from content scripts?)
 
 
-// observer options
-const config = {attributes: true, childList: true, subtree: true };
+// // observer options
+// const config = {attributes: true, childList: true, subtree: true };
 
-const target = document.querySelector('#content');
+// const target = document.querySelector('#content');
 
-const titleQuery = `document.querySelector(".show-title-link")`;
-const episodeQuery = `document.querySelector('.erc-current-media-info').getElementsByTagName("h1")` // also found under script json block as "episodeNumber"
-
-
-const observer = new MutationObserver((mutationList) => {
-    if (document.querySelector(".show-title-link") && document) {
-    }
-})
+// const titleQuery = `document.querySelector(".show-title-link")`;
+// const episodeQuery = `document.querySelector('.erc-current-media-info').getElementsByTagName("h1")` // also found under script json block as "episodeNumber"
 
 
-function getShowInfo() {
-    var show = new Object();
-    show.title = getTitle();
-    show.episode = getEpisode();
-    console.log(show);
-    // disconnect observer
-}
-
-function getTitle() {
-    console.log("Getting Title...");
-}
+// const observer = new MutationObserver((mutationList) => {
+//     if (document.querySelector(".show-title-link") && document) {
+//     }
+// })
 
 
-observer.observe(target, config)
+// function getShowInfo() {
+//     var show = new Object();
+//     show.title = getTitle();
+//     show.episode = getEpisode();
+//     console.log(show);
+//     // disconnect observer
+// }
+
+// function getTitle() {
+//     console.log("Getting Title...");
+// }
+
+
+// observer.observe(target, config)
+///////
 
 // window.onload()
 
@@ -71,6 +72,8 @@ function getAnimeInfo(response) {
 
 const target = "*://crunchyroll.com/content/v2/cms/objects/*";
 
+
+// DOESN'T WORK AS A CONTENT SCRIPT, ONLY A BG SCRIPT
 browser.webRequest.onCompleted.addListener(
     getAnimeInfo(),
     {urls: target}, // only target the MAL auth URL
